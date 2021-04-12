@@ -8,19 +8,21 @@ pipelines:
   - name: pipeline_S_PS_PublishBuildInfo_0004
     steps:
       - name: S_PS_PublishBuildInfo_0004_1
-        type: Bash
+        type: PowerShell
         configuration:
+          nodePool: win_2019
           integrations:
             - name: s_artifactory
         execution:
           onExecute:
             - echo "${run_id}" > S_PS_PublishBuildInfo_0004.txt
             - $jfrog_cli_path rt upload S_PS_PublishBuildInfo_0004.txt test-automation-generic-local
-            - add_run_files /tmp/jfrog/. jfrog
+            - add_run_files (Join-Path ([System.IO.Path]::GetTempPath()) jfrog) jfrog
             - add_run_variables buildName=${JFROG_CLI_BUILD_NAME} buildNumber=${JFROG_CLI_BUILD_NUMBER}
       - name: S_PS_PublishBuildInfo_0004_2
         type: PublishBuildInfo
         configuration:
+          nodePool: win_2019
           outputResources:
             - name: S_PS_PublishBuildInfo_0004_output
           inputSteps:
@@ -28,12 +30,13 @@ pipelines:
       - name: S_PS_PublishBuildInfo_0004_3
         type: Bash
         configuration:
+          nodePool: win_2019
           integrations:
             - name: s_artifactory
           inputResources:
             - name: S_PS_PublishBuildInfo_0004_output
         execution:
           onExecute:
-            - if [ "$res_S_PS_PublishBuildInfo_0004_output_buildName" != "$buildName" ]; then return 1; fi
-            - if [ "$res_S_PS_PublishBuildInfo_0004_output_buildNumber" != "$buildNumber" ]; then return 1; fi
+            - if ("$res_S_PS_PublishBuildInfo_0004_output_buildName" -ne "$buildName") { throw("failed") }
+            - if ("$res_S_PS_PublishBuildInfo_0004_output_buildNumber" -ne "$buildNumber") { throw("failed") }
             - jfrog rt curl -XDELETE /api/build/${buildName}?buildNumbers=${buildNumber}&artifacts=1
