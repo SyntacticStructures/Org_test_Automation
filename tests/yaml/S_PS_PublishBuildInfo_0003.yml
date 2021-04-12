@@ -17,8 +17,8 @@ pipelines:
             - name: s_artifactory
         execution:
           onExecute:
-            - echo "${run_id}" > S_PS_PublishBuildInfo_0003.txt
-            - $jfrog_cli_path rt upload S_PS_PublishBuildInfo_0003.txt test-automation-generic-local
+            - Set-Content -Path S_PS_PublishBuildInfo_0003.txt -Value ${run_id}
+            - Invoke-Expression "$jfrog_cli_path rt upload S_PS_PublishBuildInfo_0003.txt test-automation-generic-local"
             - add_run_files (Join-Path ([System.IO.Path]::GetTempPath()) jfrog) jfrog
             - add_run_variables buildName=${JFROG_CLI_BUILD_NAME} buildNumber=${JFROG_CLI_BUILD_NUMBER}
       - name: S_PS_PublishBuildInfo_0003_2
