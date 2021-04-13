@@ -25,7 +25,6 @@ pipelines:
         type: PublishBuildInfo
         configuration:
           nodePool: win_2019
-          envExclude: "myEnvironmentVariable"
           outputResources:
             - name: S_PS_PublishBuildInfo_0008_output
           inputSteps:
@@ -43,7 +42,5 @@ pipelines:
             - jfrog rt curl -XGET "/api/build/${JFROG_CLI_BUILD_NAME}/${JFROG_CLI_BUILD_NUMBER}" -o ${step_tmp_dir}/response
             - jfrog rt curl -XDELETE "/api/build/${JFROG_CLI_BUILD_NAME}?buildNumbers=${JFROG_CLI_BUILD_NUMBER}&artifacts=1"
             - Get-Content ${step_tmp_dir}/response
-            - $myVar = $(Get-Content ${step_tmp_dir}\response | ConvertFrom-Json).buildInfo.properties.'buildInfo.env.myEnvironmentVariable'; add_run_variables myVariable=$myVar
-            - if ("" -ne "$myVariable") { throw("failed") }
             - $myVar = $(Get-Content ${step_tmp_dir}\response | ConvertFrom-Json).buildInfo.properties.'buildInfo.env.int_s_artifactory_apikey'; add_run_variables excludedVariable=$myVar
             - if ("" -ne "$excludedVariable") { throw("failed") }

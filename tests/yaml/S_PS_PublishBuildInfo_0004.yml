@@ -18,7 +18,7 @@ pipelines:
             - Set-Content -Path S_PS_PublishBuildInfo_0004.txt -Value ${run_id}
             - Invoke-Expression "$jfrog_cli_path rt upload S_PS_PublishBuildInfo_0004.txt test-automation-generic-local"
             - add_run_files (Join-Path ([System.IO.Path]::GetTempPath()) jfrog) jfrog
-            - add_run_variables buildName=${JFROG_CLI_BUILD_NAME} buildNumber=${JFROG_CLI_BUILD_NUMBER}
+            - add_run_variables buildStepName=S_PS_PublishBuildInfo_0004_1 S_PS_PublishBuildInfo_0004_1_buildName=${JFROG_CLI_BUILD_NAME} S_PS_PublishBuildInfo_0004_1_buildNumber=${JFROG_CLI_BUILD_NUMBER}
       - name: S_PS_PublishBuildInfo_0004_2
         type: PublishBuildInfo
         configuration:
@@ -37,6 +37,6 @@ pipelines:
             - name: S_PS_PublishBuildInfo_0004_output
         execution:
           onExecute:
-            - if ("$res_S_PS_PublishBuildInfo_0004_output_buildName" -ne "$buildName") { throw("failed") }
-            - if ("$res_S_PS_PublishBuildInfo_0004_output_buildNumber" -ne "$buildNumber") { throw("failed") }
-            - jfrog rt curl -XDELETE "/api/build/${buildName}?buildNumbers=${buildNumber}&artifacts=1"
+            - if ("$res_S_PS_PublishBuildInfo_0004_output_buildName" -ne "${JFROG_CLI_BUILD_NAME}") { throw("failed") }
+            - if ("$res_S_PS_PublishBuildInfo_0004_output_buildNumber" -ne "${JFROG_CLI_BUILD_NUMBER}") { throw("failed") }
+            - jfrog rt curl -XDELETE "/api/build/${JFROG_CLI_BUILD_NAME}?buildNumbers=${JFROG_CLI_BUILD_NUMBER}&artifacts=1"
